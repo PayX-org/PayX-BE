@@ -1,21 +1,30 @@
-const express = require("express");
-const connectDB = require('./config/db');
-
+const express = require('express');
 const app = express();
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 
-connectDB();
+// Your routes and middleware
+app.get('/', (req, res) => {
+  res.send('Hello, world!');
+});
 
-// Middleware
-app.use(express.json());
+const server = app.listen(PORT, () => {
+  console.log(`App listening on port ${PORT}`);
+});
 
+// Export the server for testing
+module.exports = server;
 
+// Gracefully stop the server
+const stopServer = () => {
+  server.close(() => {
+    console.log('Server stopped');
+    process.exit(0); // Exit the process
+  });
+};
 
-app.get("/", (req, res) => {
-    res.sendStatus(200);
-})
-
-
-app.listen(PORT, () => {
-    console.log(`App listening in port ${PORT}`);
-})
+// Use this in your tests to stop the server
+if (process.env.NODE_ENV === 'test') {
+  setTimeout(() => {
+    stopServer();
+  }, 5000); // Stop the server after 5 seconds (for example)
+}
