@@ -20,15 +20,5 @@ jobs:
 
       - run: npm install
 
-      - name: Start server
-        run: |
-          node index.js &
-          echo $! > server.pid
-        env:
-          PORT: 3001
-
       - name: Run tests
         run: npm test
-
-      - name: Stop server
-        run: kill $(cat server.pid)

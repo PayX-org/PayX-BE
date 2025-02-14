@@ -6,9 +6,26 @@ app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
 
-const server = app.listen(PORT, () => {
-  console.log(`App listening on port ${PORT}`);
-});
+let server;
 
-module.exports = server;
+// Only start the server if not in test mode
+if (process.env.NODE_ENV !== 'test') {
+  server = app.listen(PORT, () => {
+    console.log(`App listening on port ${PORT}`);
+  });
+}
 
+// Gracefully stop the server
+const stopServer = () => {
+  if (server) {
+    server.close(() => {
+      console.log('Server stopped');
+      process.exit(0);
+    });
+  }
+};
+
+process.on('SIGTERM', stopServer);
+process.on('SIGINT', stopServer);
+
+module.exports = { app, stopServer };
