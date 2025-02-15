@@ -1,14 +1,37 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
+const { MongoClient } = require('mongodb');
+const uri = "mongodb+srv://PayXDBusername:vioZmZq9e69Hhb4r@cluster1.lc1wr.mongodb.net/?retryWrites=true&w=majority&appName=cluster1";
 
-const connectDB = async () => {
+let db;
+let client;
+
+async function connectDB() {
   try {
-    const conn = await mongoose.connect(process.env.MONGO_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
+    if (db) return db; // Reuse existing connection
+    
+    client = new MongoClient(uri);
+    await client.connect();
+    console.log('Connected to MongoDB'); // Debug log
+    
+    db = client.db('PayX-db');
+    return db;
   } catch (error) {
-    console.error(`Error: ${error.message}`);
-    process.exit(1); // Exit process with failure
+    console.error('MongoDB connection error:', error);
+    throw error;
   }
-};
+}
 
-module.exports = connectDB;
+async function closeDB() {
+  try {
+    if (client) {
+      await client.close();
+      console.log('Disconnected from MongoDB'); // Debug log
+      db = null;
+      client = null;
+    }
+  } catch (error) {
+    console.error('Error closing MongoDB connection:', error);
+    throw error;
+  }
+}
+
+module.exports = { connectDB, closeDB };

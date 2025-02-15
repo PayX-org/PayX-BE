@@ -1,10 +1,16 @@
 const express = require('express');
+const paymentRoutes = require('./routes/paymentRoutes');
+
 const app = express();
 const PORT = process.env.PORT || 30002;
+
+app.use(express.json());
 
 app.get('/', (req, res) => {
   res.send('Hello, world!');
 });
+
+app.use('/api/payments', paymentRoutes);
 
 let server;
 
