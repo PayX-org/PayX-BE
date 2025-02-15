@@ -12,6 +12,11 @@ app.get('/', (req, res) => {
 
 app.use('/api/payments', paymentRoutes);
 
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ message: 'Something broke!' });
+});
+
 let server;
 
 // Only start the server if not in test mode
